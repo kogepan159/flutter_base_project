@@ -1,35 +1,24 @@
-import 'package:base_project/models/repository.dart';
 import 'package:base_project/utils/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:base_project/utils/alret.dart';
-import 'package:base_project/viewModels/repository_list_view_model.dart';
-import 'package:flutter_state_notifier/flutter_state_notifier.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import '../models/repository.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 class RepositoryListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return StateNotifierProvider<RepositoryListViewModel, RepositoryListViewState>(
-        create: (_) => RepositoryListViewModel(),
-        child:RepositoryListPage()
-    );
-    // Here we take the value from the MyHomePage object that was created by);
+    return RepositoryListPage();
   }
 }
 
-class RepositoryListPage extends StatelessWidget {
+class RepositoryListPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final counter = useProvider(repositoryProvider);
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text("リポジトリ取得画面"),
       ),
       body: Padding(
@@ -41,7 +30,7 @@ class RepositoryListPage extends StatelessWidget {
                 decoration: InputDecoration(
                     labelText: "GithubName",
                     hintText: "ユーザーIDともいうかも"),
-                onChanged:context.watch<RepositoryListViewModel>().handleSearchText
+                onChanged:repositoryList.handleSearchText
               ),
               Text('',
                 style: TextStyle(
@@ -59,9 +48,9 @@ class RepositoryListPage extends StatelessWidget {
                   onPressed: () async {
                     // プログレスインジケーター
                     ProgressDialog.showProgressDialog(context);
-                    await context.read<RepositoryListViewModel>().getRepositoriesApi();
+                    await repositoryList.getRepositoriesApi();
                     Navigator.of(context).pop();
-                    if (context.read<RepositoryListViewState>().list.length == 0) {
+                    if (repositoryList.list.length == 0) {
                       AlertUtil.showOkAlertDialog(context, "API情報確認", "更新失敗");
                     } else {
                       AlertUtil.showOkAlertDialog(context, "API情報確認", "更新成功");
@@ -86,10 +75,10 @@ class RepositoryListPage extends StatelessWidget {
         Expanded(
             child: ListView.builder(
                 physics: AlwaysScrollableScrollPhysics(),
-                itemCount: context.select<RepositoryListViewState, int>((RepositoryListViewState state) => state.list?.length ?? 0),
+                itemCount: repositoryList.list?.length ?? 0,
                 itemBuilder: (BuildContext context, int i) {
                   return ListTile(
-                    title: Text( context.read<RepositoryListViewState>().list[i].name ?? ""),
+                    title: Text( repositoryList.list[i].name ?? ""),
                   );
                 },
               ),
