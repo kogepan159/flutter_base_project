@@ -16,7 +16,8 @@ class RepositoryListView extends StatelessWidget {
 class RepositoryListPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final counter = useProvider(repositoryProvider);
+    final counter = useProvider(repositoryListProvider);
+    final state = useProvider(repositoryListProvider.state);
     return Scaffold(
       appBar: AppBar(
         title: Text("リポジトリ取得画面"),
@@ -30,7 +31,7 @@ class RepositoryListPage extends HookWidget {
                 decoration: InputDecoration(
                     labelText: "GithubName",
                     hintText: "ユーザーIDともいうかも"),
-                onChanged:repositoryList.handleSearchText
+                onChanged:counter.handleSearchText
               ),
               Text('',
                 style: TextStyle(
@@ -48,9 +49,9 @@ class RepositoryListPage extends HookWidget {
                   onPressed: () async {
                     // プログレスインジケーター
                     ProgressDialog.showProgressDialog(context);
-                    await repositoryList.getRepositoriesApi();
+                    await counter.getRepositoriesApi();
                     Navigator.of(context).pop();
-                    if (repositoryList.list.length == 0) {
+                    if (counter.state.length == 0) {
                       AlertUtil.showOkAlertDialog(context, "API情報確認", "更新失敗");
                     } else {
                       AlertUtil.showOkAlertDialog(context, "API情報確認", "更新成功");
@@ -75,10 +76,10 @@ class RepositoryListPage extends HookWidget {
         Expanded(
             child: ListView.builder(
                 physics: AlwaysScrollableScrollPhysics(),
-                itemCount: repositoryList.list?.length ?? 0,
+                itemCount: state.length ?? 0,
                 itemBuilder: (BuildContext context, int i) {
                   return ListTile(
-                    title: Text( repositoryList.list[i].name ?? ""),
+                    title: Text( state[i].name ?? ""),
                   );
                 },
               ),

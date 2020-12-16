@@ -26,6 +26,8 @@ dependencies:
   pedantic_mono: ^1.9.1
   equatable:
   freezed_annotation:
+  state_notifier:
+  flutter_state_notifier:
   flutter_hooks: ^0.15.0
   hooks_riverpod: ^0.12.1
   simple_logger: ^1.7.0
