@@ -13,20 +13,6 @@ class RepositoryWidget {
     );
   }
 
-  RaisedButton makeRaisedButton(Future<void> action) {
-    return RaisedButton(
-        child: Text("取得"),
-        color: Colors.lightBlue[200],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        onPressed:(){
-          action;
-        },
-        padding: EdgeInsets.all(10)
-    );
-  }
-
   Text makeSpaceLabel() {
     return Text('',
       style: TextStyle(

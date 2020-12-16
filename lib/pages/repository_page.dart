@@ -7,7 +7,6 @@ import '../models/repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RepositoryPage extends HookWidget {
-
   @override
   Widget build(BuildContext context) {
     final counter = useProvider(repositoryListProvider);
@@ -24,7 +23,25 @@ class RepositoryPage extends HookWidget {
                 children: <Widget>[
                   repositoryWidget.makeTextField(counter),
                   repositoryWidget.makeSpaceLabel(),
-                  repositoryWidget.makeRaisedButton(getAction(context, counter)),
+                  RaisedButton(
+                      child: Text("取得"),
+                      color: Colors.lightBlue[200],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onPressed: () async {
+                        // プログレスインジケーター
+                        ProgressDialog.showProgressDialog(context);
+                        await counter.getRepositoriesApi();
+                        Navigator.of(context).pop();
+                        if (counter.state.length == 0) {
+                          AlertUtil.showOkAlertDialog(context, "API情報確認", "更新失敗");
+                        } else {
+                          AlertUtil.showOkAlertDialog(context, "API情報確認", "更新成功");
+                        }
+                      },
+                      padding: EdgeInsets.all(10)
+                  ),
                   repositoryWidget.makeSpaceLabel(),
                   repositoryWidget.makeRepositoryLabel(),
                   Expanded(
@@ -32,7 +49,10 @@ class RepositoryPage extends HookWidget {
                       physics: AlwaysScrollableScrollPhysics(),
                       itemCount: state.length ?? 0,
                       itemBuilder: (BuildContext context, int i) {
-                        return ;
+                        return ListTile(
+                          title: Text( state[i].name ?? ""),
+                        );
+
                       },
                     ),
                   ),
@@ -41,15 +61,4 @@ class RepositoryPage extends HookWidget {
     );
   }
 
-  Future<void> getAction(BuildContext context, RepositoryList counter) async {
-    // プログレスインジケーター
-    ProgressDialog.showProgressDialog(context);
-    await counter.getRepositoriesApi();
-    Navigator.of(context).pop();
-    if (counter.state.length == 0) {
-      AlertUtil.showOkAlertDialog(context, "API情報確認", "更新失敗");
-    } else {
-      AlertUtil.showOkAlertDialog(context, "API情報確認", "更新成功");
-    }
-  }
 }
