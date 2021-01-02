@@ -5,6 +5,8 @@ import 'package:base_project/utils/alret.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import '../models/repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 
 class RepositoryPage extends HookWidget {
   @override
@@ -12,6 +14,23 @@ class RepositoryPage extends HookWidget {
     final counter = useProvider(repositoryListProvider);
     final state = useProvider(repositoryListProvider.state);
     final repositoryWidget = RepositoryWidget();
+
+    String _data = "Load JSON Data";
+    Future<void> loadJsonAsset() async {
+      _data = "";
+      String loadData = await rootBundle.loadString('json/import.json');
+      final jsonResponse = json.decode(loadData);
+      jsonResponse.forEach((key,value) => _data = _data + '$key: $value \x0A');
+      print("-----------------------");
+      //全体を表示する
+      print(_data);
+      // resultsのdefinitionを取得
+      for (var result in jsonResponse["results"]) {
+        print("配列中身見る:" + result["definition"]);
+      }
+      print("-----------------------");
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text("リポジトリ取得画面"),
@@ -30,6 +49,7 @@ class RepositoryPage extends HookWidget {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       onPressed: () async {
+                        await loadJsonAsset();
                         // プログレスインジケーター
                         ProgressDialog.showProgressDialog(context);
                         await counter.getRepositoriesApi();
